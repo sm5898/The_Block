@@ -1,53 +1,105 @@
-import React from "react";
-import {MapContainer,TileLayer,Marker} from "react-leaflet"
-import {useEffect,useState} from "react"
-import api from "../api/api"
+import React, { useState } from "react"
+import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet"
+import L from "leaflet"
+import "leaflet/dist/leaflet.css"
 import Navbar from "../components/Navbar"
+import { useSearch } from "../context/SearchContext"
+import "../styles/map.css"
 
-export default function ExploreMap(){
+const SERVICE_COLOR = "#4A1A0A"
+const BORROW_COLOR = "#D4703A"
 
-const [listings,setListings]=useState([])
-
-useEffect(()=>{
-
-api.get("/listings")
-.then(res=>setListings(res.data))
-
-},[])
-
-return(
-
-<div>
-
-<Navbar active="explore"/>
-
-<MapContainer
-center={[40.72,-73.98]}
-zoom={13}
-className="map"
->
-
-<TileLayer
-url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-/>
-
-{
-
-listings.map(item=>(
-
-<Marker
-key={item._id}
-position={[item.location.lat,item.location.lng]}
-/>
-
-))
-
+function createPinIcon(color, title) {
+ return L.divIcon({
+  className: "",
+  html: `
+   <div class="map-pin">
+    <svg width="22" height="28" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <path d="M11 0C4.925 0 0 4.925 0 11c0 7.667 11 17 11 17S22 18.667 22 11C22 4.925 17.075 0 11 0z" fill="${color}"/>
+     <circle cx="11" cy="10" r="4" fill="white" fill-opacity="0.65"/>
+    </svg>
+    <div class="map-pin-label" style="background:${color}">${title}</div>
+   </div>
+  `,
+  iconSize: [0, 0],
+  iconAnchor: [11, 28],
+ })
 }
 
-</MapContainer>
+export default function ExploreMap() {
+ const { filtered, query, setQuery, filter, setFilter } = useSearch()
+ const [searchOpen, setSearchOpen] = useState(false)
 
-</div>
+ const mapListings = filtered.filter(
+  item => item.location?.lat && item.location?.lng
+ )
 
-)
+ return (
+  <div className="map-page">
+   <Navbar active="explore" />
+   <div className="map-wrapper">
+    <MapContainer
+     center={[40.724, -73.984]}
+     zoom={15}
+     className="map-container"
+     zoomControl={false}
+    >
+     <TileLayer
+      url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>'
+      subdomains="abcd"
+      maxZoom={19}
+     />
+     <ZoomControl position="bottomright" />
+     {mapListings.map(item => (
+      <Marker
+       key={item._id}
+       position={[item.location.lat, item.location.lng]}
+       icon={createPinIcon(
+        item.type?.toLowerCase() === "service" ? SERVICE_COLOR : BORROW_COLOR,
+        item.title
+       )}
+      />
+     ))}
+    </MapContainer>
 
+    {/* Search button / expandable input — top left */}
+    <div className="map-search-overlay">
+     {searchOpen ? (
+      <input
+       autoFocus
+       className="map-search-input"
+       placeholder="Search listings..."
+       value={query}
+       onChange={e => setQuery(e.target.value)}
+       onBlur={() => { if (!query) setSearchOpen(false) }}
+      />
+     ) : (
+      <button className="map-search-btn" onClick={() => setSearchOpen(true)} aria-label="Search">
+       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="16.5" y1="16.5" x2="22" y2="22" />
+       </svg>
+      </button>
+     )}
+    </div>
+
+    {/* Borrow / Service filter pills — top right */}
+    <div className="map-filters">
+     <button
+      className={`map-filter-btn${filter === "borrow" ? " map-filter-borrow-active" : ""}`}
+      onClick={() => setFilter(filter === "borrow" ? "all" : "borrow")}
+     >
+      Borrow
+     </button>
+     <button
+      className={`map-filter-btn${filter === "service" ? " map-filter-service-active" : ""}`}
+      onClick={() => setFilter(filter === "service" ? "all" : "service")}
+     >
+      Service
+     </button>
+    </div>
+   </div>
+  </div>
+ )
 }
