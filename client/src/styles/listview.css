@@ -1,0 +1,73 @@
+/* ── List View toolbar ─────────────────────────── */
+
+.lv-toolbar {
+ display: flex;
+ align-items: center;
+ gap: 16px;
+ padding: 24px 60px 0 60px;
+}
+
+.lv-search-wrap {
+ display: flex;
+ align-items: center;
+ background: white;
+ border: 1.5px solid #e5e7eb;
+ border-radius: 999px;
+ padding: 10px 18px;
+ gap: 8px;
+ flex: 1;
+ max-width: 400px;
+ box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.lv-search-icon {
+ flex-shrink: 0;
+}
+
+.lv-search-input {
+ border: none;
+ outline: none;
+ font-size: 14px;
+ width: 100%;
+ background: transparent;
+ color: #111827;
+}
+
+.lv-filters {
+ display: flex;
+ gap: 8px;
+}
+
+.lv-filter-btn {
+ background: white;
+ border: 1.5px solid #1f2937;
+ border-radius: 999px;
+ padding: 8px 22px;
+ font-size: 14px;
+ font-weight: 600;
+ cursor: pointer;
+ color: #1f2937;
+ transition: all 0.15s;
+}
+
+.lv-filter-btn:hover {
+ background: #f3f4f6;
+}
+
+.lv-filter-btn.lv-filter-borrow-active {
+ background: #D4703A;
+ border-color: #D4703A;
+ color: white;
+}
+
+.lv-filter-btn.lv-filter-service-active {
+ background: #4A1A0A;
+ border-color: #4A1A0A;
+ color: white;
+}
+
+.lv-empty {
+ color: #6b7280;
+ padding: 40px 60px;
+ font-size: 15px;
+}
