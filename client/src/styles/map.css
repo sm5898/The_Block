@@ -1,12 +1,103 @@
 /* ── Explore Map page ─────────────────────────── */
 
 .map-page {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
- display: flex;
- flex-direction: column;
- height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Hover popup card ─────────────────────────── */
+
+.map-hover-card {
+ position: absolute;
+ transform: translate(-50%, 8px);
+ z-index: 1100;
+ width: 240px;
+ background: white;
+ border-radius: 12px;
+ box-shadow: 0 8px 28px rgba(0,0,0,0.18);
  overflow: hidden;
+ pointer-events: auto;
+ animation: hover-pop 0.15s ease;
+}
+
+@keyframes hover-pop {
+ from { opacity: 0; transform: translate(-50%, 2px); }
+ to   { opacity: 1; transform: translate(-50%, 8px); }
+}
+
+.map-hover-header {
+ padding: 10px 14px;
+ color: white;
+ font-weight: 700;
+ font-size: 15px;
+ font-family: Inter, Arial, sans-serif;
+}
+
+.map-hover-body {
+ padding: 12px 14px 10px;
+}
+
+.map-hover-meta {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ margin-bottom: 8px;
+}
+
+.map-hover-avatar {
+ width: 32px;
+ height: 32px;
+ border-radius: 50%;
+ background: #0B1F44;
+ color: white;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 13px;
+ font-weight: 600;
+ flex-shrink: 0;
+}
+
+.map-hover-posted {
+ font-size: 11px;
+ color: #888;
+ line-height: 1.2;
+}
+
+.map-hover-name {
+ font-size: 13px;
+ font-weight: 600;
+ color: #111;
+ line-height: 1.2;
+}
+
+.map-hover-dist {
+ margin-left: auto;
+ font-size: 12px;
+ color: #555;
+ white-space: nowrap;
+}
+
+.map-hover-desc {
+ font-size: 13px;
+ color: #444;
+ margin: 0 0 10px;
+ line-height: 1.45;
+}
+
+.map-hover-divider {
+ border: none;
+ border-top: 1px solid #e5e7eb;
+ margin: 0 0 8px;
+}
+
+.map-hover-cta {
+ font-size: 12px;
+ color: #888;
+ margin: 0;
+ text-align: center;
 }
 
 .map-wrapper {
@@ -33,12 +124,12 @@
 
 .map-pin-label {
  color: white;
- font-size: 12px;
+ font-size: 14px;
  font-weight: 600;
- padding: 3px 10px;
+ padding: 5px 14px;
  border-radius: 999px;
  white-space: nowrap;
- margin-top: 3px;
+ margin-top: 4px;
  font-family: Inter, Arial, sans-serif;
  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
 }

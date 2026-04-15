@@ -1,9 +1,10 @@
 # Dependencies
 node_modules/
+**/node_modules/
 
 # Vite build output & cache
 client/dist/
-client/.vite/
+**/.vite/
 
 # Environment variables
 .env
