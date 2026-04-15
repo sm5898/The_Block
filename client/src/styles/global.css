@@ -24,16 +24,6 @@ button{
  padding:60px;
 }
 
-.card{
- border:2px solid #7A3E2E;
- padding:20px;
-}
-
-.card img{
- width:100%;
- border-radius:12px;
-}
-
 .leaflet-container {
   outline: none;
 }
