@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
@@ -11,7 +13,7 @@ app.use(cors())
 app.use(express.json())
 
 mongoose
- .connect("mongodb://127.0.0.1:27017/theblock")
+ .connect(process.env.MONGODB_URI)
  .catch((error) => {
   console.error("MongoDB connection failed:", error.message)
  })
