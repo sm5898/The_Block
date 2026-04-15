@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -200,6 +201,7 @@ export default function CreatePost() {
               <p className="cp-card-posted">Posted by [You]</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
