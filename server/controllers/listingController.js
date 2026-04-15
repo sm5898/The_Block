@@ -1,7 +1,7 @@
-const Listing = require("../models/Listing");
+import Listing from "../models/Listing.js";
 
 // GET all listings
-const getListings = async (req, res) => {
+export const getListings = async (req, res) => {
   try {
     const { type, search, availability } = req.query;
 
@@ -35,7 +35,7 @@ const getListings = async (req, res) => {
 };
 
 // GET one listing by ID
-const getListingById = async (req, res) => {
+export const getListingById = async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id);
 
@@ -53,7 +53,7 @@ const getListingById = async (req, res) => {
 };
 
 // POST create listing
-const createListing = async (req, res) => {
+export const createListing = async (req, res) => {
   try {
     const {
       title,
@@ -105,7 +105,7 @@ const createListing = async (req, res) => {
 };
 
 // PUT update listing
-const updateListing = async (req, res) => {
+export const updateListing = async (req, res) => {
   try {
     const updatedListing = await Listing.findByIdAndUpdate(
       req.params.id,
@@ -127,7 +127,7 @@ const updateListing = async (req, res) => {
 };
 
 // DELETE listing
-const deleteListing = async (req, res) => {
+export const deleteListing = async (req, res) => {
   try {
     const deletedListing = await Listing.findByIdAndDelete(req.params.id);
 
@@ -142,12 +142,4 @@ const deleteListing = async (req, res) => {
       error: error.message,
     });
   }
-};
-
-module.exports = {
-  getListings,
-  getListingById,
-  createListing,
-  updateListing,
-  deleteListing,
 };
