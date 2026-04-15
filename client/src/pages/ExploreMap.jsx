@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet"
 import { useNavigate } from "react-router-dom"
 import L from "leaflet"
@@ -15,7 +15,7 @@ function createPinIcon(color, title) {
   className: "",
   html: `
    <div class="map-pin">
-    <svg width="22" height="28" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="32" height="40" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
      <path d="M11 0C4.925 0 0 4.925 0 11c0 7.667 11 17 11 17S22 18.667 22 11C22 4.925 17.075 0 11 0z" fill="${color}"/>
      <circle cx="11" cy="10" r="4" fill="white" fill-opacity="0.65"/>
     </svg>
@@ -23,14 +23,23 @@ function createPinIcon(color, title) {
    </div>
   `,
   iconSize: [0, 0],
-  iconAnchor: [11, 28],
+  iconAnchor: [16, 40],
  })
 }
 
 export default function ExploreMap() {
  const { filtered, query, setQuery, filter, setFilter } = useSearch()
  const [searchOpen, setSearchOpen] = useState(false)
+ const [hovered, setHovered] = useState(null)
+ const hoverTimeout = useRef(null)
  const navigate = useNavigate()
+
+ const clearHover = () => {
+  hoverTimeout.current = setTimeout(() => setHovered(null), 150)
+ }
+ const cancelClearHover = () => {
+  if (hoverTimeout.current) clearTimeout(hoverTimeout.current)
+ }
 
  const mapListings = filtered.filter(
   item => item.location?.lat && item.location?.lng
@@ -42,7 +51,7 @@ export default function ExploreMap() {
    <div className="map-wrapper">
     <MapContainer
      center={[40.724, -73.984]}
-     zoom={15}
+     zoom={17}
      className="map-container"
      zoomControl={false}
     >
@@ -61,11 +70,61 @@ export default function ExploreMap() {
         item.type?.toLowerCase() === "service" ? SERVICE_COLOR : BORROW_COLOR,
         item.title
        )}
+       eventHandlers={{
+        mouseover: (e) => {
+         cancelClearHover()
+         const el = e.originalEvent.target.closest(".leaflet-marker-icon")
+         if (el) {
+          const rect = el.getBoundingClientRect()
+          const wrapperRect = document.querySelector(".map-wrapper").getBoundingClientRect()
+          setHovered({
+           item,
+           x: rect.left - wrapperRect.left + rect.width / 2,
+           y: rect.top - wrapperRect.top + 70,
+          })
+         }
+        },
+        mouseout: () => clearHover(),
+       }}
       />
      ))}
     </MapContainer>
 
-    {/* Search button / expandable input — top left */}
+    {hovered && (
+     <div
+      className="map-hover-card"
+      style={{ left: hovered.x, top: hovered.y }}
+      onMouseEnter={cancelClearHover}
+      onMouseLeave={() => setHovered(null)}
+     >
+      <div
+       className="map-hover-header"
+       style={{ background: hovered.item.type?.toLowerCase() === "service" ? SERVICE_COLOR : BORROW_COLOR }}
+      >
+       {hovered.item.title}
+      </div>
+      <div className="map-hover-body">
+       <div className="map-hover-meta">
+        <div className="map-hover-avatar">
+         {(hovered.item.createdBy || "?")[0].toUpperCase()}
+        </div>
+        <div>
+         <div className="map-hover-posted">Posted by:</div>
+         <div className="map-hover-name">{hovered.item.createdBy || "A neighbor"}</div>
+        </div>
+        {hovered.item.distance && (
+         <div className="map-hover-dist">{hovered.item.distance}</div>
+        )}
+       </div>
+       {hovered.item.description && (
+        <p className="map-hover-desc">{hovered.item.description}</p>
+       )}
+       <hr className="map-hover-divider" />
+       <p className="map-hover-cta">Click to view more details</p>
+      </div>
+     </div>
+    )}
+
     <div className="map-search-overlay">
      {searchOpen ? (
       <input
@@ -86,7 +145,6 @@ export default function ExploreMap() {
      )}
     </div>
 
-    {/* Borrow / Service filter pills — top right */}
     <div className="map-filters">
      <button
       className={`map-filter-btn${filter === "borrow" ? " map-filter-borrow-active" : ""}`}
@@ -101,7 +159,6 @@ export default function ExploreMap() {
       Service
      </button>
 
-     {/* View toggle */}
      <div className="view-toggle">
       <button className="view-toggle-btn" onClick={() => navigate("/list")} aria-label="List view">
        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

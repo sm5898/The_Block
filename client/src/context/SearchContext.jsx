@@ -11,7 +11,6 @@ export function SearchProvider({ children }) {
   const fetchListings = async () => {
     try {
       const res = await api.get("/listings");
-      console.log("Fetched listings:", res.data);
       setListings(res.data);
     } catch (err) {
       console.error("Error fetching listings:", err);
@@ -43,8 +42,6 @@ export function SearchProvider({ children }) {
     <SearchContext.Provider
       value={{
         listings,
-        setListings,
-        fetchListings,
         filtered,
         query,
         setQuery,
