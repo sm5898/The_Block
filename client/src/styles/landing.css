@@ -6,7 +6,7 @@ html, body {
 /* ── Background ────────────────────────────────── */
 
 .landing-bg {
-  min-height: 100vh;
+  height: 100vh;
   width: 100vw;
   position: relative;
   background: url("/Images/Landing.png") center center/cover no-repeat;
@@ -37,35 +37,24 @@ html, body {
   bottom: 0;
   z-index: 3;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  padding: 32px 0 18px 48px;
+  padding: clamp(20px, 2.5vw, 32px) 0 clamp(12px, 1.5vw, 18px) clamp(24px, 3.5vw, 48px);
   width: 45vw;
-  min-width: 700px;
+  min-width: min(700px, 90vw);
   max-width: 900px;
   box-sizing: border-box;
-  height: 270px;
-  overflow: hidden;
+  height: auto;
 }
 
-.block-card::after {
-  content: "";
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  right: -130px;
-  bottom: -130px;
-  background: inherit;
-  border-radius: 50%;
-  z-index: -1;
-}
 
 .landing-title {
   font-family: 'Libre Franklin', Arial, sans-serif;
-  font-size: 128px;
+  font-size: clamp(36px, min(5.5vw, 11vh), 110px);
   font-weight: 800;
   color: #00113A;
   margin: 0;
-  line-height: 1.05;
-  letter-spacing: 0;
+  line-height: 1.0;
+  letter-spacing: -1px;
+  white-space: nowrap;
 }
 
 .landing-sub {
