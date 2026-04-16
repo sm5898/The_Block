@@ -51,7 +51,7 @@ export default function Signup() {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      navigate("/success");
+      navigate("/welcome");
     } catch (err) {
       setError(err?.response?.data?.message || "Could not create account");
     } finally {

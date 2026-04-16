@@ -10,6 +10,7 @@ import ListView from "./pages/Listview"
 import Messages from "./pages/Messages"
 import CreatePost from "./pages/Createpost"
 import MyListings from "./pages/MyListings";
+import Welcome from "./pages/Welcome";
 
 export default function App(){
 
@@ -23,6 +24,7 @@ return(
 <Route path="/" element={<Landing/>}/>
 <Route path="/signup" element={<Signup/>}/>
 <Route path="/success" element={<Success/>}/>
+<Route path="/welcome" element={<Welcome/>}/>
 <Route path="/explore" element={<ExploreMap/>}/>
 <Route path="/list" element={<ListView/>}/>
 <Route path="/messages" element={<Messages/>}/>
