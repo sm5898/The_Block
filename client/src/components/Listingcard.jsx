@@ -3,26 +3,24 @@ import "../styles/cards.css"
 
 export default function ListingCard({listing}){
 
-return(
+ return(
 
-<div className="card">
+  <div className="card">
 
-<div className="card-type">
+   <div className="card-type">
+    {listing.type}
+   </div>
 
-{listing.type}
+   <h2>{listing.title}</h2>
 
-</div>
+   <p className="card-availability">
+    {listing.availability || "No availability set"}
+   </p>
 
-<h2>
+   <img src={listing.image} alt={listing.title} />
 
-{listing.title}
+  </div>
 
-</h2>
-
-<img src={listing.image}/>
-
-</div>
-
-)
+ )
 
 }
