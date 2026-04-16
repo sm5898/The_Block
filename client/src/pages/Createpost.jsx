@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+
+import React, { useState, useRef, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import api from "../api/api";
@@ -18,7 +19,24 @@ export default function CreatePost() {
   const [showCal, setShowCal] = useState(false);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
+  const [location, setLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("detecting");
+  const [submitError, setSubmitError] = useState("");
   const fileInputRef = useRef();
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus("unavailable");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationStatus("ready");
+      },
+      () => setLocationStatus("denied")
+    );
+  }, []);
 
   const handleFiles = (files) => {
     const file = files[0];
@@ -42,23 +60,39 @@ export default function CreatePost() {
   const borderColor = postType === "lend" ? BORROW_COLOR : SERVICE_COLOR;
 
   const submit = async () => {
-    const data = new FormData();
-    data.append("title", title);
-    data.append("description", description);
-    data.append("type", postType);
-    data.append("company", company);
-    data.append("availability", availabilityText);
-    if (images[0]) data.append("image", images[0]);
-    await api.post("/listings", data);
+    setSubmitError("");
+    if (!location) {
+      setSubmitError("Location is required. Please allow location access and try again.");
+      return;
+    }
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      setSubmitError("You must be logged in to create a listing.");
+      return;
+    }
+    await api.post("/listings", {
+      title,
+      description,
+      type: postType,
+      company,
+      availability: availabilityText,
+      location,
+      createdBy: user.firstName,
+    });
   };
 
   return (
     <div className="cp-page">
       <Navbar active="post" />
+
       <div className="cp-body">
         <h1 className="cp-heading">Create Post</h1>
+
         <div className="cp-layout">
+          {/* ── FORM ── */}
           <div className="cp-form">
+
+            {/* Post Type toggle */}
             <div className="cp-type-row">
               <span className="cp-type-label">Post Type:</span>
               <div className="cp-type-toggle">
@@ -72,12 +106,16 @@ export default function CreatePost() {
                 >Service</button>
               </div>
             </div>
+
+            {/* Title */}
             <label className="cp-label">Title:</label>
             <input
               className="cp-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
+
+            {/* Description | Availability */}
             <label className="cp-label">Description | Availability</label>
             <div className="cp-desc-wrap">
               <textarea
@@ -122,6 +160,8 @@ export default function CreatePost() {
                 )}
               </div>
             </div>
+
+            {/* Product Company */}
             <label className="cp-label">
               Product Company:
               <span className="cp-optional"> Optional</span>
@@ -131,6 +171,8 @@ export default function CreatePost() {
               value={company}
               onChange={(e) => setCompany(e.target.value)}
             />
+
+            {/* Upload Pictures */}
             <label className="cp-label">Upload Pictures:</label>
             <div className="cp-chips">
               {images.map((f) => (
@@ -161,8 +203,21 @@ export default function CreatePost() {
                 onChange={(e) => handleFiles(e.target.files)}
               />
             </div>
-            <button className="cp-submit" onClick={submit}>Create Listing</button>
+
+            {submitError && <p className="cp-error">{submitError}</p>}
+            {locationStatus === "detecting" && (
+              <p className="cp-location-status">Detecting your location...</p>
+            )}
+            {locationStatus === "denied" && (
+              <p className="cp-error">Location access denied. Please enable it in your browser and refresh.</p>
+            )}
+            {locationStatus === "unavailable" && (
+              <p className="cp-error">Geolocation is not supported by your browser.</p>
+            )}
+            <button className="cp-submit" onClick={submit} disabled={locationStatus !== "ready"}>Create Listing</button>
           </div>
+
+          {/* ── LIVE PREVIEW ── */}
           <div className="cp-preview-section">
             <h2 className="cp-preview-heading">Preview of Listing</h2>
             <div className="cp-card" style={{ borderColor }}>
@@ -184,6 +239,7 @@ export default function CreatePost() {
               <p className="cp-card-posted">Posted by [You]</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
