@@ -47,12 +47,10 @@ export default function Navbar({ active, locked, showSearch, searchProps }) {
   return (
     <>
       <div className={`navbar ${showSearch ? "navbar-transparent" : ""}`}>
-        {/* Logo */}
         <div className="logo">
           <div /><div /><div /><div />
         </div>
 
-        {/* Search bar — only on explore page */}
         {showSearch ? (
           <div className="navbar-search-wrap" ref={searchProps?.searchRef}>
             <div style={{ position: "relative", flex: 1 }}>
@@ -63,8 +61,8 @@ export default function Navbar({ active, locked, showSearch, searchProps }) {
                 onChange={searchProps?.handleSearchChange}
               />
               <svg
-                style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
               >
                 <circle cx="11" cy="11" r="7" />
                 <line x1="16.5" y1="16.5" x2="22" y2="22" />
@@ -91,11 +89,7 @@ export default function Navbar({ active, locked, showSearch, searchProps }) {
               )}
             </div>
 
-            {/* Borrow / Service pills */}
             <div className="navbar-filter-pills">
-              {(searchProps?.filter !== "all" || searchProps?.query) && (
-                <button className="navbar-clear-btn" onClick={searchProps?.handleClear}>× Clear</button>
-              )}
               <button
                 className={`navbar-pill${searchProps?.filter === "borrow" ? " navbar-pill-borrow-active" : " navbar-pill-borrow"}`}
                 onClick={() => searchProps?.setFilter(searchProps?.filter === "borrow" ? "all" : "borrow")}
@@ -104,6 +98,31 @@ export default function Navbar({ active, locked, showSearch, searchProps }) {
                 className={`navbar-pill${searchProps?.filter === "service" ? " navbar-pill-service-active" : " navbar-pill-service"}`}
                 onClick={() => searchProps?.setFilter(searchProps?.filter === "service" ? "all" : "service")}
               >Service</button>
+              {(searchProps?.filter !== "all" || searchProps?.query) && (
+                <button className="navbar-clear-btn" onClick={searchProps?.handleClear}>× Clear</button>
+              )}
+
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", borderLeft: "1px solid #e5e7eb", paddingLeft: "12px" }}>
+                <span style={{ fontSize: "13px", color: "#6b7280", whiteSpace: "nowrap", fontWeight: "600" }}>
+                  📍 {searchProps?.distanceFilter ? `${searchProps.distanceFilter} mi` : "Any"}
+                </span>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="5"
+                  step="0.5"
+                  value={searchProps?.distanceFilter || 5}
+                  onChange={e => {
+                    const val = parseFloat(e.target.value)
+                    searchProps?.setDistanceFilter(val === 5 ? null : val)
+                  }}
+                  style={{
+                    width: "90px",
+                    accentColor: "#0B1F44",
+                    cursor: "pointer"
+                  }}
+                />
+              </div>
             </div>
           </div>
         ) : (
@@ -114,7 +133,6 @@ export default function Navbar({ active, locked, showSearch, searchProps }) {
           </div>
         )}
 
-        {/* Avatar */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           {user ? (
             <div className="nb-avatar-wrap" ref={dropdownRef}>
