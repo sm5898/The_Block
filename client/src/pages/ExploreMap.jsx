@@ -29,7 +29,7 @@ function createPinIcon(color, title) {
 }
 
 export default function ExploreMap() {
-  const { filtered, query, setQuery, filter, setFilter } = useSearch();
+  const { filtered, query, setQuery, filter, setFilter, availabilityFilter, setAvailabilityFilter } = useSearch();
   const [searchOpen, setSearchOpen] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [selectedListing, setSelectedListing] = useState(null);
@@ -184,12 +184,13 @@ export default function ExploreMap() {
         </div>
 
         <div className="map-filters">
-          {(filter !== "all" || query) && (
+          {(filter !== "all" || query || availabilityFilter !== "all") && (
             <button
               className="map-clear-filters-btn"
               onClick={() => {
                 setFilter("all");
                 setQuery("");
+                setAvailabilityFilter("all");
               }}
             >
               × Clear
@@ -209,6 +210,18 @@ export default function ExploreMap() {
           >
             Service
           </button>
+
+          <select
+            className="map-availability-filter"
+            value={availabilityFilter}
+            onChange={(e) => setAvailabilityFilter(e.target.value)}
+          >
+            <option value="all">All Availability</option>
+            <option value="now">Available Now</option>
+            <option value="weekends">Weekends</option>
+            <option value="weekdays">Weekdays</option>
+            <option value="anytime">Anytime</option>
+          </select>
 
           <div className="view-toggle">
             <button
