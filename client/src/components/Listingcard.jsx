@@ -74,7 +74,7 @@ export default function ListingCard({ listing, onClick, onToggleSave, isSaved })
       )}
 
       <hr className="card-divider" />
-      <p className="card-posted">Posted by {listing.createdBy || "a neighbor"}</p>
+      <p className="card-posted">Posted by {listing.createdBy || listing.postedBy || "a neighbor"}</p>
     </div>
   );
 }

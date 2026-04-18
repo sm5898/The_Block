@@ -63,6 +63,7 @@ export default function CreatePost() {
   const [submitError, setSubmitError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -215,6 +216,14 @@ export default function CreatePost() {
   return (
     <div className="cp-page">
       <Navbar active="post" />
+      {showToast && (
+        <div className="cp-toast">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Listing created successfully!
+        </div>
+      )}
 
       {showSuccess && (
         <div className="cp-success-popup">
