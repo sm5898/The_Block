@@ -463,3 +463,92 @@
   color: #888;
   margin: 0;
 }
+
+.cp-chip--inactive {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.cp-availability-box {
+  margin-top: 8px;
+  position: relative;
+}
+
+.cp-availability-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cp-availability-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cp-availability-btn:hover {
+  border-color: #0B1F44;
+  color: #0B1F44;
+}
+
+.cp-availability-btn.cp-availability-btn--active {
+  background: #0B1F44;
+  color: #fff;
+  border-color: #0B1F44;
+}
+
+.cp-weekday-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cp-weekday-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cp-weekday-btn.cp-weekday-btn--active {
+  background: #0B1F44;
+  color: #fff;
+  border-color: #0B1F44;
+}
+
+.cp-cal-popup--standalone {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-top: 12px;
+  width: fit-content;
+  z-index: 9999;
+}
+
+.cp-delete-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 16px;
+  background: #b91c1c !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cp-delete-btn:hover {
+  opacity: 0.9;
+}

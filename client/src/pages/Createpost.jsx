@@ -13,6 +13,16 @@ import "../styles/createpost.css";
 const BORROW_COLOR = "#D4703A";
 const SERVICE_COLOR = "#4A1A0A";
 
+const WEEKDAY_OPTIONS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 function createSelectedLocationIcon() {
   return L.divIcon({
     className: "",
@@ -65,6 +75,8 @@ export default function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const fileInputRef = useRef();
+  const [availabilityMode, setAvailabilityMode] = useState("anytime");
+  const [selectedDays, setSelectedDays] = useState([]);
 
   useEffect(() => {
     if (isEditMode) return;
@@ -124,11 +136,43 @@ export default function CreatePost() {
     if (remaining.length === 0) setImagePreviewUrl(null);
   };
 
-  const availabilityText = startDate
-    ? endDate
-      ? `${startDate.toLocaleDateString()} – ${endDate.toLocaleDateString()}`
-      : startDate.toLocaleDateString()
-    : "Available Anytime";
+
+  const handleDelete = async () => {
+  try {
+    const confirmed = window.confirm("Are you sure you want to delete this listing?");
+    if (!confirmed) return;
+
+    await api.delete(`/listings/${id}`);
+    await fetchListings();
+    navigate("/explore");
+  } catch (error) {
+    console.error("Error deleting listing:", error);
+    setSubmitError(
+      error?.response?.data?.message || "Failed to delete listing."
+    );
+  }
+};
+
+  const availabilityText =
+    availabilityMode === "dates"
+      ? startDate
+        ? endDate
+          ? `${startDate.toLocaleDateString()} – ${endDate.toLocaleDateString()}`
+          : startDate.toLocaleDateString()
+        : "Available Anytime"
+      : availabilityMode === "weekends"
+      ? "Weekends Only"
+      : availabilityMode === "weekdays" && selectedDays.length > 0
+      ? selectedDays.join(", ")
+      : "Available Anytime";
+
+  const toggleDay = (day) => {
+    setSelectedDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
+  };
 
   const borderColor = postType === "lend" ? BORROW_COLOR : SERVICE_COLOR;
 
@@ -263,61 +307,122 @@ export default function CreatePost() {
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            <label className="cp-label">Description | Availability</label>
+            <label className="cp-label">Description </label>
             <div className="cp-desc-wrap">
               <textarea
                 className="cp-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <div className="cp-desc-divider" />
-              <div className="cp-cal-wrap">
-                <button
-                  type="button"
-                  className="cp-cal-btn"
-                  onClick={() => setShowCal((v) => !v)}
-                  title="Pick availability dates"
-                >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B1F44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <line x1="16" y1="2" x2="16" y2="6" />
-                    <line x1="8" y1="2" x2="8" y2="6" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                  </svg>
-                </button>
-
-                {showCal && (
-                  <div className="cp-cal-popup">
-                    <DatePicker
-                      selected={startDate}
-                      onChange={(dates) => {
-                        setDateRange(dates);
-                        if (dates[0] && dates[1]) setShowCal(false);
-                      }}
-                      startDate={startDate}
-                      endDate={endDate}
-                      selectsRange
-                      inline
-                    />
-                    {(startDate || endDate) && (
-                      <button
-                        type="button"
-                        className="cp-cal-clear"
-                        onClick={() => {
-                          setDateRange([null, null]);
-                          setShowCal(false);
-                        }}
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
 
+            <label className="cp-label">Availability</label>
+
+        <div className="cp-availability-box">
+          <div className="cp-availability-options">
+            <button
+              type="button"
+              className={`cp-availability-btn${availabilityMode === "anytime" ? " cp-availability-btn--active" : ""}`}
+              onClick={() => {
+                setAvailabilityMode("anytime");
+                setSelectedDays([]);
+                setDateRange([null, null]);
+                setShowCal(false);
+              }}
+            >
+              Anytime
+            </button>
+
+            <button
+              type="button"
+              className={`cp-availability-btn${availabilityMode === "weekends" ? " cp-availability-btn--active" : ""}`}
+              onClick={() => {
+                setAvailabilityMode("weekends");
+                setSelectedDays([]);
+                setDateRange([null, null]);
+                setShowCal(false);
+              }}
+            >
+              Weekends Only
+            </button>
+
+            <button
+              type="button"
+              className={`cp-availability-btn${availabilityMode === "weekdays" ? " cp-availability-btn--active" : ""}`}
+              onClick={() => {
+                setAvailabilityMode("weekdays");
+                setDateRange([null, null]);
+                setShowCal(false);
+              }}
+            >
+              Select Weekdays
+            </button>
+
+            <button
+              type="button"
+              className={`cp-availability-btn${availabilityMode === "dates" ? " cp-availability-btn--active" : ""}`}
+              onClick={() => {
+                if (availabilityMode === "dates" && showCal) {
+                  setShowCal(false);
+                  return;
+                }
+
+                setAvailabilityMode("dates");
+                setSelectedDays([]);
+                setShowCal(true);
+              }}
+            >
+              Specific Dates
+            </button>
+          </div>
+          
+          {availabilityMode === "dates" && showCal && (
+            <div className="cp-cal-popup cp-cal-popup--standalone">
+              <DatePicker
+                selected={startDate}
+                onChange={(dates) => {
+                  setDateRange(dates);
+                  if (dates[0] && dates[1]) setShowCal(false);
+                }}
+                startDate={startDate}
+                endDate={endDate}
+                selectsRange
+                inline
+              />
+
+              {(startDate || endDate) && (
+                <button
+                  type="button"
+                  className="cp-cal-clear"
+                  onClick={() => {
+                    setDateRange([null, null]);
+                    setShowCal(false);
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
+
+          {availabilityMode === "weekdays" && (
+            <div className="cp-weekday-row">
+              {WEEKDAY_OPTIONS.map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  className={`cp-weekday-btn${selectedDays.includes(day) ? " cp-weekday-btn--active" : ""}`}
+                  onClick={() => toggleDay(day)}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
             <label className="cp-label">
-              Product Company:
+              Product Brand:
               <span className="cp-optional"> Optional</span>
             </label>
             <input
@@ -432,6 +537,16 @@ export default function CreatePost() {
                 ? "Update Listing"
                 : "Create Listing"}
             </button>
+
+            {isEditMode && (
+              <button
+                type="button"
+                className="cp-delete-btn"
+                onClick={handleDelete}
+              >
+                Delete Listing
+              </button>
+            )}
           </div>
 
           <div className="cp-preview-section">

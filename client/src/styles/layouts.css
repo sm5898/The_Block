@@ -285,3 +285,22 @@
 .msg-send-btn:hover {
  background: #162f66 !important;
 }
+
+.msg-convo-subject {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+.msg-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-header-listing {
+  font-size: 16px;
+  color: white;
+  opacity: 0.85;
+  margin-top: 4px;
+}

@@ -76,6 +76,11 @@ export default function Navbar({ active, locked }) {
 
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         {user ? (
+           <>
+        <span className="nav-greeting">
+          Hello {user.firstName}
+        </span>
+
           <div className="nb-avatar-wrap" ref={dropdownRef}>
             <div
               className="avatar"
@@ -96,6 +101,7 @@ export default function Navbar({ active, locked }) {
               </div>
             )}
           </div>
+          </>
         ) : (
           <>
             <span

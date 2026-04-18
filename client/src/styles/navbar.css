@@ -144,3 +144,9 @@
   background: #eee;
   margin: 4px 0;
 }
+
+.nav-greeting {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0B1F44;
+}

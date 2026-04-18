@@ -195,9 +195,16 @@ export default function Messages() {
                     >
                       <div className="msg-avatar">{c.initials}</div>
                       <div className="msg-convo-text">
-                        <div className="msg-convo-name">{c.name}</div>
-                        <div className="msg-convo-preview">{c.preview}</div>
-                      </div>
+                      <div className="msg-convo-name">{c.name}</div>
+
+                      {c.listingTitle && (
+                        <div className="msg-convo-subject">
+                          Re: {c.listingTitle}
+                        </div>
+                      )}
+
+                      <div className="msg-convo-preview">{c.preview}</div>
+                    </div>
                     </div>
                     {i < filtered.length - 1 && <div className="msg-convo-divider" />}
                   </div>
@@ -212,7 +219,7 @@ export default function Messages() {
               <div>
                 <span className="msg-header-name">{active?.name}</span>
                 {active?.listingTitle && (
-                  <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "4px" }}>
+                  <div className="msg-header-listing">
                     Re: {active.listingTitle}
                   </div>
                 )}
