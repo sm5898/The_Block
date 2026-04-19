@@ -43,7 +43,6 @@ export const createOrGetConversation = async (req, res) => {
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, recipientId], $size: 2 },
-      listingId,
     })
       .populate("participants", "firstName lastName email")
       .populate("listingId", "title createdBy image");
@@ -100,5 +99,30 @@ export const sendMessage = async (req, res) => {
       message: "Failed to send message",
       error: error.message,
     });
+  }
+};
+
+export const deleteConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const { userId } = req.body;
+
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.status(404).json({ message: "Conversation not found" });
+    }
+
+    const isParticipant = conversation.participants.some(
+      (p) => p.toString() === userId
+    );
+    if (!isParticipant) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await Conversation.findByIdAndDelete(conversationId);
+    res.status(200).json({ message: "Conversation deleted" });
+  } catch (error) {
+    console.error("DELETE CONVERSATION ERROR:", error);
+    res.status(500).json({ message: "Failed to delete conversation" });
   }
 };

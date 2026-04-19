@@ -178,6 +178,25 @@
  gap: 10px;
 }
 
+.msg-no-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #94A3B8;
+  font-size: 15px;
+  font-weight: 500;
+  height: 100%;
+}
+
+.msg-no-messages-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: #CBD5E1;
+}
+
 .msg-bubble-wrap {
  display: flex;
  justify-content: flex-start;

@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet";
+import React, { useState, useRef, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, ZoomControl, useMap, useMapEvents } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -11,21 +12,84 @@ import "../styles/map.css";
 const SERVICE_COLOR = "#4A1A0A";
 const BORROW_COLOR = "#D4703A";
 
-function createPinIcon(color, title) {
+const TILES = [
+  {
+    id: "default",
+    label: "Default",
+    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
+    subdomains: "abcd",
+  },
+  {
+    id: "warm",
+    label: "Warm",
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
+    subdomains: "abcd",
+  },
+  {
+    id: "dark",
+    label: "Dark",
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
+    subdomains: "abcd",
+  },
+  {
+    id: "minimal",
+    label: "Minimal",
+    url: "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
+    subdomains: "abcd",
+  },
+];
+
+function createPinIcon(color, title, expanded) {
+  const short = title.length > 22 ? title.slice(0, 21) + "\u2026" : title;
+  if (!expanded) {
+    return L.divIcon({
+      className: "",
+      html: `
+        <div class="map-pin-dot-only" style="background:${color};">
+          <div class="map-pin-dot-ring"></div>
+        </div>
+      `,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+  }
   return L.divIcon({
     className: "",
     html: `
       <div class="map-pin">
-        <svg width="32" height="40" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11 0C4.925 0 0 4.925 0 11c0 7.667 11 17 11 17S22 18.667 22 11C22 4.925 17.075 0 11 0z" fill="${color}"/>
-          <circle cx="11" cy="10" r="4" fill="white" fill-opacity="0.65"/>
-        </svg>
-        <div class="map-pin-label" style="background:${color}">${title}</div>
+        <div class="map-pin-bubble" style="background:${color}; --c:${color};">
+          ${short}
+        </div>
       </div>
     `,
     iconSize: [0, 0],
-    iconAnchor: [16, 40],
+    iconAnchor: [0, 34],
   });
+}
+
+function ZoomTracker({ onZoom }) {
+  useMapEvents({
+    zoomend: (e) => onZoom(e.target.getZoom()),
+  });
+  return null;
+}
+
+function AutoCenter({ center }) {
+  const map = useMap();
+  const centered = useRef(false);
+
+  useEffect(() => {
+    if (!centered.current && center[0] !== 40.724) {
+      map.setView(center, 17, { animate: true });
+      centered.current = true;
+    }
+  }, [center, map]);
+
+  return null;
 }
 
 export default function ExploreMap() {
@@ -33,8 +97,13 @@ export default function ExploreMap() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [selectedListing, setSelectedListing] = useState(null);
+  const [zoom, setZoom] = useState(17);
+  const [tileIndex, setTileIndex] = useState(0);
+  const [showTilePicker, setShowTilePicker] = useState(false);
   const hoverTimeout = useRef(null);
   const navigate = useNavigate();
+
+  const activeTile = TILES[tileIndex];
 
   const clearHover = () => {
     hoverTimeout.current = setTimeout(() => setHovered(null), 150);
@@ -48,49 +117,70 @@ export default function ExploreMap() {
     (item) => item.location?.lat && item.location?.lng
   );
 
+  const mapCenter = mapListings.length > 0
+    ? [
+        mapListings.reduce((sum, i) => sum + i.location.lat, 0) / mapListings.length,
+        mapListings.reduce((sum, i) => sum + i.location.lng, 0) / mapListings.length,
+      ]
+    : [40.724, -73.984];
+
   return (
     <div className="map-page">
       <Navbar active="explore" />
 
       <div className="map-wrapper">
         <MapContainer
-          center={[40.724, -73.984]}
+          center={mapCenter}
           zoom={17}
           className="map-container"
           zoomControl={false}
         >
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>'
-            subdomains="abcd"
+            key={activeTile.id}
+            url={activeTile.url}
+            attribution={activeTile.attribution}
+            subdomains={activeTile.subdomains}
             maxZoom={19}
           />
 
           <ZoomControl position="bottomleft" />
 
+          <AutoCenter center={mapCenter} />
+          <ZoomTracker onZoom={setZoom} />
+
+          <MarkerClusterGroup
+            chunkedLoading
+            maxClusterRadius={40}
+            iconCreateFunction={(cluster) => {
+              const count = cluster.getChildCount();
+              return L.divIcon({
+                html: `<div class="map-cluster">${count}</div>`,
+                className: "",
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+              });
+            }}
+          >
           {mapListings.map((item) => (
             <Marker
               key={item._id}
               position={[item.location.lat, item.location.lng]}
               icon={createPinIcon(
                 item.type?.toLowerCase() === "service" ? SERVICE_COLOR : BORROW_COLOR,
-                item.title
+                item.title,
+                zoom >= 15
               )}
               eventHandlers={{
                 mouseover: (e) => {
                   cancelClearHover();
-                  const el = e.originalEvent.target.closest(".leaflet-marker-icon");
-                  if (el) {
-                    const rect = el.getBoundingClientRect();
-                    const wrapperRect =
-                      document.querySelector(".map-wrapper").getBoundingClientRect();
+                  const map = e.target._map;
+                  const pt = map.latLngToContainerPoint(e.target.getLatLng());
 
-                    setHovered({
-                      item,
-                      x: rect.left - wrapperRect.left + rect.width / 2,
-                      y: rect.top - wrapperRect.top + 70,
-                    });
-                  }
+                  setHovered({
+                    item,
+                    x: pt.x,
+                    y: pt.y - 40,
+                  });
                 },
                 mouseout: () => clearHover(),
                 click: () => {
@@ -100,6 +190,7 @@ export default function ExploreMap() {
               }}
             />
           ))}
+          </MarkerClusterGroup>
         </MapContainer>
 
         {hovered && (
@@ -248,6 +339,32 @@ export default function ExploreMap() {
               </svg>
             </button>
           </div>
+        </div>
+
+        {/* Tile style picker */}
+        <div className="map-tile-picker">
+          <button
+            className="map-tile-picker-btn"
+            onClick={() => setShowTilePicker((v) => !v)}
+            title="Map style"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+          {showTilePicker && (
+            <div className="map-tile-options">
+              {TILES.map((t, i) => (
+                <button
+                  key={t.id}
+                  className={`map-tile-option${tileIndex === i ? " map-tile-option-active" : ""}`}
+                  onClick={() => { setTileIndex(i); setShowTilePicker(false); }}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

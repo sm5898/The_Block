@@ -39,6 +39,13 @@ export default function Messages() {
     const createOrOpenThread = async () => {
       try {
         if (!user?.id) return;
+
+        // Shortcut: navigate directly to an existing conversation
+        if (location.state?.conversationId) {
+          setActiveId(location.state.conversationId);
+          return;
+        }
+
         if (!location.state?.recipientId || !location.state?.listingId) return;
 
         const response = await api.post("/messages/thread", {
@@ -150,6 +157,21 @@ export default function Messages() {
     if (e.key === "Enter") sendMessage();
   };
 
+  const deleteConversation = async (id) => {
+    if (!window.confirm("Delete this conversation? This cannot be undone.")) return;
+    try {
+      await api.delete(`/messages/${id}`, { data: { userId: user.id } });
+      setConversations((prev) => prev.filter((c) => c._id !== id));
+      setActiveId((prev) => {
+        const remaining = conversations.filter((c) => c._id !== id);
+        return remaining.length > 0 ? remaining[0]._id : null;
+      });
+    } catch (err) {
+      console.error("Error deleting conversation:", err);
+      setError("Could not delete conversation.");
+    }
+  };
+
   return (
     <div className="msg-page">
       <Navbar active="messages" />
@@ -209,7 +231,7 @@ export default function Messages() {
           <div className="msg-chat-panel">
             <div className="msg-chat-header">
               <div className="msg-header-avatar">{active?.initials}</div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <span className="msg-header-name">{active?.name}</span>
                 {active?.listingTitle && (
                   <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "4px" }}>
@@ -217,6 +239,33 @@ export default function Messages() {
                   </div>
                 )}
               </div>
+              {activeId && (
+                <button
+                  onClick={() => deleteConversation(activeId)}
+                  title="Delete conversation"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "6px",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#9CA3AF",
+                    transition: "color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#EF4444")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                  </svg>
+                </button>
+              )}
             </div>
 
             <div className="msg-chat-body">
@@ -225,7 +274,13 @@ export default function Messages() {
                   <MessageBubble key={msg.id} message={msg} />
                 ))
               ) : (
-                <p style={{ color: "#6B7280" }}>No messages yet</p>
+                <div className="msg-no-messages">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <span>No messages yet</span>
+                  <span className="msg-no-messages-sub">Say hello to start the conversation</span>
+                </div>
               )}
             </div>
 

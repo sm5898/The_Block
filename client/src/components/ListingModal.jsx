@@ -80,7 +80,7 @@ export default function ListingModal({ listing, onClose }) {
     }
   };
 
-  const handleMessageClick = () => {
+  const handleMessageClick = async () => {
     if (!user?.id) {
       setSaveMessage("Please log in to send messages.");
       setTimeout(() => setSaveMessage(""), 2000);
@@ -99,12 +99,31 @@ export default function ListingModal({ listing, onClose }) {
       return;
     }
 
-    navigate("/messages", {
-      state: {
-        recipientId: listing.createdById,
-        listingId: listing._id,
-      },
-    });
+    try {
+      const convRes = await api.get(`/messages/${user.id}`);
+      const existing = convRes.data.find(
+        (c) =>
+          c.participants?.some((p) => (p._id || p) === listing.createdById)
+      );
+
+      if (existing) {
+        navigate("/messages", { state: { conversationId: existing._id } });
+      } else {
+        navigate("/messages", {
+          state: {
+            recipientId: listing.createdById,
+            listingId: listing._id,
+          },
+        });
+      }
+    } catch {
+      navigate("/messages", {
+        state: {
+          recipientId: listing.createdById,
+          listingId: listing._id,
+        },
+      });
+    }
   };
 
   const handleDelete = async () => {
@@ -205,7 +224,7 @@ export default function ListingModal({ listing, onClose }) {
             {isSaved ? "❤️ Unsave" : "🤍 Save"}
           </button>
 
-          <button className="lm-msg-btn" onClick={() => navigate("/saved")}>
+          <button className="lm-msg-btn" onClick={() => navigate("/profile")}>
             View Saved
           </button>
 
