@@ -116,28 +116,91 @@
  height: 100%;
 }
 
+.map-pin-dot-only {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+  transition: transform 0.12s ease;
+}
+
+.map-pin-dot-only:hover {
+  transform: scale(1.35);
+}
+
+.map-pin-dot-ring {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+}
+
+/* ── Cluster bubble ───────────────────────────── */
+
+.map-cluster {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0B1F44;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: Inter, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.map-cluster:hover {
+  transform: scale(1.12);
+}
+
 /* ── Custom pin ───────────────────────────────── */
 
 .map-pin {
- display: flex;
- flex-direction: column;
- align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.22));
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-.map-pin svg {
- display: block;
+.map-pin:hover {
+  transform: translateX(-50%) translateY(-3px);
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.28));
 }
 
-.map-pin-label {
- color: white;
- font-size: 14px;
- font-weight: 600;
- padding: 5px 14px;
- border-radius: 999px;
- white-space: nowrap;
- margin-top: 4px;
- font-family: Inter, Arial, sans-serif;
- box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+.map-pin-bubble {
+  position: relative;
+  border-radius: 10px;
+  padding: 5px 11px;
+  white-space: nowrap;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: Inter, Arial, sans-serif;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.map-pin-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid var(--c);
 }
 
 /* ── Search overlay (top-left) ────────────────── */
@@ -149,10 +212,81 @@
  z-index: 1000;
 }
 
+/* ── Tile style picker (bottom-right) ─────────── */
+
+.map-tile-picker {
+  position: absolute;
+  bottom: 106px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.map-tile-picker-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  color: #0B1F44;
+  transition: box-shadow 0.15s;
+}
+
+.map-tile-picker-btn:hover {
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+}
+
+.map-tile-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: white;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  order: -1;
+}
+
+.map-tile-option {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: Inter, Arial, sans-serif;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.map-tile-option:hover {
+  background: #f3f4f6;
+}
+
+.map-tile-option-active {
+  background: #0B1F44;
+  color: white;
+}
+
+.map-tile-option-active:hover {
+  background: #0B1F44;
+}
+
 
 .map-search-btn {
- width: 48px;
- height: 48px;
+ width: 38px;
+ height: 38px;
  border-radius: 50%;
  background: #0B1F44;
  border: none;
@@ -292,6 +426,8 @@
  box-shadow: 0 2px 8px rgba(0,0,0,0.18) !important;
  border-radius: 8px !important;
  overflow: hidden;
+ margin-left: 10px !important;
+ margin-bottom: 16px !important;
 }
 
 .leaflet-control-zoom-in,
