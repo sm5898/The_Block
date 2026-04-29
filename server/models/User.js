@@ -1,3 +1,6 @@
+// ─── User Model ───────────────────────────────────────────────────────────────
+// Represents a registered user. Passwords are stored as bcrypt hashes — never
+// return the password field to the client (use .select("-password")).
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -15,30 +18,31 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true,  // Enforced at the DB index level
       trim: true,
       lowercase: true,
     },
     password: {
       type: String,
-      required: true,
+      required: true, // Stored as a bcrypt hash — never plaintext
     },
     bio: {
       type: String,
       default: "",
       trim: true,
-      maxlength: 300,
+      maxlength: 300, // Keep bios short for display purposes
     },
     location: {
       type: String,
       default: "",
-      trim: true,
+      trim: true,   // Free-text neighborhood name, e.g. "East Village, NY"
     },
     photo: {
       type: String,
       default: "",
-      trim: true,
+      trim: true,   // Base64 data URI or a URL string
     },
+    // Array of Listing ObjectIds the user has bookmarked
     savedListings: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -46,7 +50,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true } // Adds createdAt and updatedAt automatically
 );
 
 export default mongoose.model("User", userSchema);
