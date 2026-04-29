@@ -203,6 +203,16 @@
 
 /* ── Responsive ─────────────────────────────────── */
 
+@media (max-width: 1024px) {
+  .ln-left {
+    padding: 48px 40px 40px;
+  }
+
+  .ln-right {
+    padding: 48px 40px;
+  }
+}
+
 @media (max-width: 768px) {
   .ln-root {
     grid-template-columns: 1fr;
@@ -212,7 +222,7 @@
   }
 
   .ln-left {
-    padding: 36px 28px 32px;
+    padding: 36px 24px 32px;
     min-height: auto;
   }
 
@@ -235,6 +245,11 @@
 
   .ln-form-title {
     font-size: 28px;
+  }
+
+  .ln-btn {
+    align-self: stretch;
+    text-align: center;
   }
 }
 
