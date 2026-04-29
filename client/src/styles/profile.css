@@ -740,23 +740,80 @@
   .pf-layout {
     grid-template-columns: 240px 1fr;
   }
+
+  .pf-panels-row {
+    flex-direction: column;
+  }
+
+  .pf-listings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
   .pf-page {
-    padding: 20px 16px 60px;
+    padding: 16px 16px 60px;
   }
 
   .pf-layout {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .pf-page-title {
-    font-size: 26px;
+    font-size: 24px;
+    margin-bottom: 16px;
   }
 
   .pf-sidebar-card,
   .pf-edit-card {
-    padding: 24px 20px;
+    padding: 20px 16px;
+  }
+
+  .pf-panels-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pf-section {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .pf-section-title {
+    font-size: 17px;
+  }
+
+  .pf-listings-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .pf-listing-img {
+    height: 110px;
+  }
+
+  .pf-avatar-initials,
+  .pf-avatar-img {
+    width: 80px;
+    height: 80px;
+    font-size: 22px;
+  }
+
+  .pf-name {
+    font-size: 18px;
+  }
+
+  .pf-saved-overlay > div {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .pf-edit-actions {
+    flex-direction: column;
+  }
+
+  .pf-main {
+    gap: 16px;
   }
 }
