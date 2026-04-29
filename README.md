@@ -210,9 +210,16 @@ cd ../client && npm install --legacy-peer-deps
 ```
 
 ### 3. Configure environment
+Create `server/.env` with the variables listed in the section above. Example values are shown in the "Environment Variables" section — do not commit this file.
+
+If you have an example file in the repo, you can copy it; otherwise create the file manually:
+
 ```bash
-# Create server/.env with the variables listed in the section above
-cp server/.env.example server/.env   # if example exists, otherwise create manually
+# If an example exists
+cp server/.env.example server/.env
+
+# Or create it manually (recommended for private keys)
+# Edit server/.env and set MONGODB_URI, JWT_SECRET, GROQ_API_KEY, and optional PORT
 ```
 
 ### 4. Start both servers
